@@ -29,7 +29,7 @@ void SPI1_init()
 	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
 	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b; //////////////!!!!!!!!
 	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-        SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;///////////////!!!!!!!!!!!!!
+        SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;///////////////!!!!!!!!!!!!!
 	SPI_Init(SPI1, &SPI_InitStructure);
 	SPI_Cmd(SPI1, ENABLE);
 }

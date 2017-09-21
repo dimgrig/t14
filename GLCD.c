@@ -94,7 +94,14 @@ unsigned char SPI_SendRecvByte (unsigned char byte_s)
 
 	SPI_I2S_SendData(SPI1, byte_s);
 
-	while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+	//while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+        
+        for(int i = 0; i < 1000; )
+        {
+          i++;
+          if (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) != RESET)
+              break;
+        }
 	return (uint16_t)SPI_I2S_ReceiveData(SPI1);
 }
 

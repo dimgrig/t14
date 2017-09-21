@@ -13,6 +13,8 @@
 #include "t14-power.h"
 #include "GUI.h"
 
+//#define TP_TEST_DRAW
+
 volatile static uint32_t s_Tick;
 void LEDsSet (unsigned int);
 
@@ -123,9 +125,9 @@ void main(void)
 
 
 void EXTI0_IRQHandler()
-{
-    EXTI_ClearFlag(EXTI_Line0);  
-         
+{    
+    EXTI_ClearFlag(EXTI_Line0); 
+    
     if (GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_0) == 0)
     {	
       if (TouchDelay == 0)
@@ -143,7 +145,7 @@ void EXTI0_IRQHandler()
               TP_DrawPoint(display.x,display.y);  
             #endif
             
-            if ((display.x < 120) && (display.y > 270))
+            if ((display.x < 120) && (display.y > 200))
             {
               TouchDelay = 1;
               
@@ -184,7 +186,7 @@ void EXTI0_IRQHandler()
                 break;
               }
             }
-            else if ((display.x > 120) && (display.y > 270))
+            else if ((display.x > 120) && (display.y > 200))
             {
               
               TouchDelay = 1;
@@ -202,6 +204,8 @@ void EXTI0_IRQHandler()
           }           
       }
     }
+    
+    
 }
 
 
@@ -216,6 +220,7 @@ void Timer2IntrHandler (void)
   
   //F = F1K/ADC_VOLTS * adc_value_f + F1B;
   F = F1K * adc_value_f + F1B;
+  //костыль
   if (F < 0.099)
   {
     F = 0;
@@ -229,7 +234,7 @@ void Timer2IntrHandler (void)
   {
     ;
   }
-  else if (TouchDelay > 2)
+  else if (TouchDelay > 1)
   {
     TouchDelay = 0;
   }
