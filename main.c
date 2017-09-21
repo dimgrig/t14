@@ -13,10 +13,25 @@
 #include "t14-power.h"
 #include "GUI.h"
 
+
+#include "usb_lib.h"
+#include "usb_desc.h"
+#include "hw_config.h"
+#include "usb_pwr.h"
+#include "usb_istr.h"
+
+
+
+
 //#define TP_TEST_DRAW
 
 volatile static uint32_t s_Tick;
 void LEDsSet (unsigned int);
+void RCC_Initializatiion(void);
+void USB_LP_IRQHandler (void);
+void USB_SetLeds(uint8_t);
+
+
 
 uint8_t init_finished = 0; 
 
@@ -58,6 +73,29 @@ void LEDsSet (unsigned int State)
   {
     STM32_LEDOff(LED2);
   }
+}
+
+void USB_SetLeds(uint8_t LED_Command) {
+        switch (LED_Command) {
+       
+        case '1': {
+            STM32_LEDOn(LED1);
+            break;
+        }
+        case '2': {
+            STM32_LEDOn(LED2);
+            break;
+        }
+        case '3': {
+          STM32_LEDOn(LED1);
+            STM32_LEDOn(LED2);
+            break;
+        }
+        case '0': {
+            ;
+            break;
+        }
+        }
 }
 
 /*************************************************************************
@@ -110,6 +148,15 @@ void main(void)
   EN_3V3_HIGH();
   EN_5V_HIGH();
   
+  
+  uint8_t i;
+  RCC_Initializatiion();	
+  SYSCFG_USBPuCmd( ENABLE );  
+
+  USB_Interrupts_Config();
+  USB_Init();
+  
+  
   init_finished = 1;
   
   __enable_interrupt();
@@ -118,7 +165,26 @@ void main(void)
   {
     //DelayUS(100);
 
-    LEDsSet(0x1);  
+    //LEDsSet(0x1); 
+    
+    		
+    /* if any data received from PC */
+    if (USB_Data_Received_Flag != 0)	
+    {		  
+        
+        /* Send data back to PC */
+        /* Data is in "USB_Rx_Buffer", Data length - USB_Data_Received_Count */
+        i = 0;
+        
+        while (USB_Data_Received_Count != 0)
+        {
+            USB_Send_Data(USB_Rx_Buffer[i]+0x03);
+            USB_SetLeds(USB_Rx_Buffer[i]);
+            i++;
+            USB_Data_Received_Count--;		
+        }	
+    USB_Data_Received_Flag = 0;		
+    }  /* if */
 
   }
 }
@@ -198,7 +264,14 @@ void EXTI0_IRQHandler()
             }
             else
             {
-              ;
+              
+              int g = 0;
+              char USB_TOUCH_Buffer[5] = "TOUCH";
+              while (g < 6)
+              {
+                  USB_Send_Data(USB_TOUCH_Buffer[g]);
+                  g++;	
+              }
             }              
            
           }           
@@ -244,3 +317,47 @@ void Timer2IntrHandler (void)
   } 
 
 }
+
+
+
+
+
+
+
+
+// ******************************
+//       RCC Initialization
+// ****************************** 
+void RCC_Initializatiion(void)
+{	 
+	/* Start HSI and connect SysClk to HSI. HSI = 16 MHz */
+	RCC_HSICmd( ENABLE );	   
+	while (RCC_GetFlagStatus(RCC_FLAG_HSIRDY) == RESET);		 				 
+	RCC_SYSCLKConfig(RCC_SYSCLKSource_HSI); 	
+  while (RCC_GetSYSCLKSource() != 0x04 );	
+	/* PLL Config */
+	RCC_PLLConfig( RCC_PLLSource_HSI,  
+                 RCC_PLLMul_6,  
+                 RCC_PLLDiv_4  
+                                );	
+	RCC_PLLCmd  ( ENABLE );	  	
+	while (RCC_GetFlagStatus( RCC_FLAG_PLLRDY ) == RESET);	  	
+	/* Enable Clock to GPIO A (USB is connected here)*/ 
+  RCC_AHBPeriphClockCmd( RCC_AHBPeriph_GPIOA, 
+                     		 ENABLE  
+                                       ) ;
+   /* USB clock enable */
+   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USB, ENABLE); 
+	 /* Enable clock to SYSCFG */ 
+	 RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);	  
+}
+
+/* #### USB Low  Priority ISR ###### */ 
+void USB_LP_IRQHandler (void) 
+{
+  USB_Istr();	
+}
+
+
+
+
