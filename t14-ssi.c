@@ -44,10 +44,39 @@ uint32_t ReadSSI(void)
     uint32_t result = 0; 
     uint32_t  portdata; 
     uint16_t N = 0;
+    uint16_t M = 2;
     
     SSI_CLK_HIGH();
     
-    for (int i = 0; i < N; )
+    for (int i = 0; i < M; )
+      i++;  
+    
+    SSI_CLK_LOW();
+    
+    for (int i = 0; i < M; )
+      i++;  
+    
+    SSI_CLK_HIGH();
+    
+    for (int i = 0; i < M; )
+      i++;  
+    
+    SSI_CLK_LOW();
+    
+    uint16_t j = 0;
+    
+    for (int i = 0; i < 100; )
+    {
+      i++; 
+      if (SSI_DATA_PORT()==0)
+      {
+        break;
+      }
+    }
+    
+    SSI_CLK_HIGH();
+         
+    for (int i = 0; i < M; )
       i++;
         
     for (bit_count=0; bit_count<19; bit_count++) 

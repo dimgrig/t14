@@ -101,7 +101,10 @@ void placeValue(double value_f, uint8_t i, uint8_t j, uint16_t mainScreenPoints[
   
   uint16_t Color = White;
   if ((i == 0) && (j == 1))
-  {
+  {   
+
+    GUI_Text(mainScreenPoints[i][0] + 3*symbol_width, mainScreenPoints[i][1] + lineHeight * 1, "      ", 6, Black, Black);
+    
     if ((value_f > 0) && (value_f < 30))
       Color = Green;
     else if (value_f > 30)

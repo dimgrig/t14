@@ -2,7 +2,8 @@
 #include "stm32l1xx.h"
 #include "stm32.h"
 
-#define A1K 0.000057220
+#define A1K 0.00002861
+//0.000057220
 #define A1B 0
 
 void InitSSI(void);

@@ -85,7 +85,13 @@ float get_adc_value()
         // ADC_GetCalibrationStatus
         // with
         // return (uint16_t) ADCx->DR;
-        valueVoltsMem[0] = ADC_GetConversionValue(ADC1);/*ADC1->DR;*/      
+        //valueVoltsMem[0] = ADC_GetConversionValue(ADC1);/*ADC1->DR;*/      
+        
+        for (int k = 0; k <= 5 ; k++)
+        {
+          valueVoltsMem[k] = ADC_GetConversionValue(ADC1);/*ADC1->DR;*/ 
+        }
+      
  
       }
       
@@ -96,11 +102,12 @@ float get_adc_value()
       }
       valueVolt = valueVolt/6;
 
-      for (int k = 5; k > 0; k--)
+ /*       for (int k = 5; k > 0; k--)
       {
         valueVoltsMem[k] = valueVoltsMem[k - 1];
       }
-        
+*/
+
       // convert  // Volt = 3.3
       // ADC = 12 bits, so 2^12 = 4096
       valueVolt = valueVolt * (ADC_VOLTS / ADC_MAX_BITS);

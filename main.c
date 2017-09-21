@@ -207,14 +207,20 @@ void EXTI0_IRQHandler()
 
 void Timer2IntrHandler (void)
 {    
-  // Clear update interrupt bit
+  // Clear update interrupt bit 
   TIM_ClearITPendingBit(TIM2,TIM_FLAG_Update);
          
   float adc_value_f = get_adc_value();  
 
   //GUI_Text(10, 10, &adc_value_c[0], 6, White, Black);
   
-  F = F1K/ADC_VOLTS * adc_value_f + F1B;
+  //F = F1K/ADC_VOLTS * adc_value_f + F1B;
+  F = F1K * adc_value_f + F1B;
+  if (F < 0.099)
+  {
+    F = 0;
+  }  
+  //A = ReadSSI();
   A = A1K*ReadSSI()+A1B;//A1cal/adc1cal * adc_value_f;
   
   placeValuesADC(F, A);
