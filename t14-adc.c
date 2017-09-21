@@ -1,6 +1,6 @@
 #include "t14-adc.h"
 
-uint16_t valueVoltsMem[6] = {2048, 2048, 2048, 2048, 2048, 2048};
+uint16_t valueVoltsMem[4] = {2048, 2048, 2048, 2048};
 uint8_t initADC = 0;
          
 void ADC_init()
@@ -72,7 +72,7 @@ float get_adc_value()
       if (initADC == 0)
       {
         initADC = 1;
-        for (int k = 0; k <= 5 ; k++)
+        for (int k = 0; k <= 3 ; k++)
         {
           valueVoltsMem[k] = ADC_GetConversionValue(ADC1);/*ADC1->DR;*/ 
         }
@@ -85,27 +85,29 @@ float get_adc_value()
         // ADC_GetCalibrationStatus
         // with
         // return (uint16_t) ADCx->DR;
-        valueVoltsMem[0] = ADC_GetConversionValue(ADC1);/*ADC1->DR;*/      
+        ////valueVoltsMem[0] = ADC_GetConversionValue(ADC1);/*ADC1->DR;*/      
         
-        /*for (int k = 0; k <= 5 ; k++)
+        for (int k = 0; k <= 39 ; k++)
         {
-          valueVoltsMem[k] = ADC_GetConversionValue(ADC1);
+          valueVoltsMem[0] = valueVoltsMem[0] + ADC_GetConversionValue(ADC1);
           
-          for (int j = 0; j <= 10; )
+          for (int j = 0; j <= 50; )
             j++;
-        }*/
+        }
+        
+        valueVoltsMem[0] = valueVoltsMem[0]/40;
       
  
       }
       
       // фильтрация       
-      for (int k = 0; k <= 5 ; k++)
+      for (int k = 0; k <= 3 ; k++)
       {
         valueVolt += valueVoltsMem[k];
       }
-      valueVolt = valueVolt/6;
+      valueVolt = valueVolt/4;
 
-      for (int k = 5; k > 0; k--)
+      for (int k = 3; k > 0; k--)
       {
         valueVoltsMem[k] = valueVoltsMem[k - 1];
       }
